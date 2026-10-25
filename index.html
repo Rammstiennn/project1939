@@ -1,13 +1,166 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#111c27"><title>Project 1939 — Poland Campaign</title><style>
-*{box-sizing:border-box}body{margin:0;background:#101923;color:#e9e5d8;font:14px system-ui,-apple-system,Segoe UI,sans-serif}header{background:#172534;border-bottom:1px solid #455465;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}h1{font-size:18px;margin:0;letter-spacing:2px}small{color:#c6c8c3}.pill{background:#283d4b;border:1px solid #536373;border-radius:7px;padding:7px 10px}button{border:1px solid #7e8d8d;border-radius:7px;background:#304658;color:#fff;padding:10px 13px;font-weight:700;cursor:pointer;touch-action:manipulation}button:disabled{opacity:.4}button.primary{background:#9d7350}button.active{outline:2px solid #f2d289}main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px;padding:12px;max-width:1450px;margin:auto}#mapwrap{position:relative;background:#253a42;border:1px solid #586b73;border-radius:9px;overflow:hidden;min-height:400px;touch-action:none}canvas{display:block;width:100%;height:100%;touch-action:none}#hint{position:absolute;bottom:8px;left:10px;background:#0e1b23d9;padding:7px;border-radius:5px;font-size:12px;pointer-events:none}aside{display:flex;flex-direction:column;gap:10px}.panel{background:#1b2b38;border:1px solid #435564;border-radius:9px;padding:12px}.panel h2{margin:0 0 10px;font-size:15px;color:#efd6a6}.row{display:flex;justify-content:space-between;gap:10px;margin:7px 0}.actions{display:flex;flex-wrap:wrap;gap:6px}.actions button{flex:1;min-width:90px}#log{height:155px;overflow:auto;font-size:12px;line-height:1.5;color:#d1d6d1}#log div{padding:4px 0;border-bottom:1px solid #344553}.legend{display:flex;gap:14px;flex-wrap:wrap;padding:0 12px 14px;max-width:1450px;margin:auto;color:#d0d4d1;font-size:12px}.sw{display:inline-block;width:12px;height:12px;margin-right:5px;border-radius:2px}.notice{color:#f3d18e;font-size:12px;min-height:30px}#end{display:none;position:fixed;inset:0;background:#071018d9;z-index:5;align-items:center;justify-content:center;padding:18px}#end>div{background:#1b2b38;border:2px solid #c49a60;border-radius:12px;padding:30px;max-width:440px;text-align:center}#end h2{font-size:30px}footer{text-align:center;color:#a6b2b6;font-size:11px;padding:6px}@media(max-width:850px){main{grid-template-columns:1fr}#mapwrap{min-height: min(65vh,550px);height:55vh}aside{display:grid;grid-template-columns:1fr 1fr}.panel{min-width:0}}@media(max-width:530px){header{padding:8px}h1{font-size:16px}main{padding:6px;gap:6px}#mapwrap{height:51vh;min-height:300px}aside{display:flex}.panel{padding:10px}.pill{padding:5px 7px;font-size:12px}}
-#zoomBtns{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:5px}#zoomBtns button{width:38px;height:38px;padding:0;background:#172b39e8;font-size:21px}button{min-height:42px}#hint{max-width:calc(100% - 55px)}@media(orientation:landscape) and (max-height:600px){header{padding:5px 12px;flex-wrap:nowrap}header h1{font-size:15px}header small{display:none}main{display:grid;grid-template-columns:minmax(0,1fr) 265px;padding:5px;gap:6px;height:calc(100dvh - 57px)}#mapwrap{height:100%;min-height:0}aside{display:flex;overflow-y:auto;gap:6px}.panel{padding:8px}.panel h2{margin-bottom:5px;font-size:13px}.row{margin:3px 0}.legend,footer{display:none}#log{height:90px}#hint{font-size:10px;padding:5px}button{min-height:36px;padding:6px}}@media(orientation:portrait) and (max-width:650px){#mapwrap{height:48dvh;min-height:270px}}
-</style></head><body><header><div><h1>PROJECT 1939</h1><small>POLAND CAMPAIGN · Prototype 0.2</small></div><div class="pill" id="date">1 SEP 1939 · TURN 1</div><div class="pill" id="resources">⚙ 12 Industry · 👥 18 Manpower</div><button id="endTurn" class="primary">END TURN →</button></header><main><section id="mapwrap"><canvas id="map"></canvas><div id="hint">Tap a German province → tap a neighboring province to attack · Drag to pan · Pinch to zoom</div><div id="zoomBtns"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button><button id="homeView" aria-label="Fit map">⌖</button></div></section><aside><section class="panel"><h2 id="provinceTitle">COMMAND HQ</h2><div id="details">Select a German province to command its army. Capture Warsaw to win.</div><p class="notice" id="notice"></p><div class="actions"><button id="recruit">+ Infantry (4⚙ 3👥)</button><button id="tank">+ Tank (7⚙ 4👥)</button><button id="fortify">Fortify (3⚙)</button></div></section><section class="panel"><h2>WAR REPORT</h2><div class="row"><span>Germany</span><b id="gcount">—</b></div><div class="row"><span>Poland</span><b id="pcount">—</b></div><div class="row"><span>Warsaw</span><b id="warsaw">Polish control</b></div><div class="row"><span>Turn</span><b id="turn">1</b></div><div class="actions"><button id="reset">New campaign</button><button id="help">How to play</button></div></section><section class="panel"><h2>DISPATCHES</h2><div id="log"></div></section></aside></main><div class="legend"><span><i class="sw" style="background:#697e8b"></i>Germany (you)</span><span><i class="sw" style="background:#b58b5b"></i>Poland (AI)</span><span><i class="sw" style="background:#536f68"></i>Neutral / impassable</span><span>⚔ Armies shown as infantry / tanks</span></div><footer>Fictionalized 1939 regional map and simplified mechanics; historical geography is approximate. Runs offline after download.</footer><div id="end"><div><h2 id="endTitle"></h2><p id="endText"></p><button onclick="restart()">PLAY AGAIN</button></div></div><script>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#111c27">
+<title>Project 1939 — Poland Campaign</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101923;color:#e9e5d8;font:14px system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:#172534;border-bottom:1px solid #455465;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+h1{font-size:18px;margin:0;letter-spacing:2px}
+small{color:#c6c8c3}
+.pill{background:#283d4b;border:1px solid #536373;border-radius:7px;padding:7px 10px}
+button{border:1px solid #7e8d8d;border-radius:7px;background:#304658;color:#fff;padding:10px 13px;font-weight:700;cursor:pointer;touch-action:manipulation;min-height:42px}
+button:disabled{opacity:.4}
+button.primary{background:#9d7350}
+button.active{outline:2px solid #f2d289}
+main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px;padding:12px;max-width:1450px;margin:auto}
+#mapwrap{position:relative;background:#253a42;border:1px solid #586b73;border-radius:9px;overflow:hidden;min-height:400px;touch-action:none}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+#hint{position:absolute;bottom:8px;left:10px;background:#0e1b23d9;padding:7px;border-radius:5px;font-size:12px;pointer-events:none;max-width:calc(100% - 55px)}
+aside{display:flex;flex-direction:column;gap:10px}
+.panel{background:#1b2b38;border:1px solid #435564;border-radius:9px;padding:12px}
+.panel h2{margin:0 0 10px;font-size:15px;color:#efd6a6}
+.row{display:flex;justify-content:space-between;gap:10px;margin:7px 0}
+.actions{display:flex;flex-wrap:wrap;gap:6px}
+.actions button{flex:1;min-width:90px}
+#log{height:155px;overflow:auto;font-size:12px;line-height:1.5;color:#d1d6d1}
+#log div{padding:4px 0;border-bottom:1px solid #344553}
+.legend{display:flex;gap:14px;flex-wrap:wrap;padding:0 12px 14px;max-width:1450px;margin:auto;color:#d0d4d1;font-size:12px}
+.sw{display:inline-block;width:12px;height:12px;margin-right:5px;border-radius:2px}
+.notice{color:#f3d18e;font-size:12px;min-height:30px}
+#end{display:none;position:fixed;inset:0;background:#071018d9;z-index:5;align-items:center;justify-content:center;padding:18px}
+#end>div{background:#1b2b38;border:2px solid #c49a60;border-radius:12px;padding:30px;max-width:440px;text-align:center}
+#end h2{font-size:30px}
+footer{text-align:center;color:#a6b2b6;font-size:11px;padding:6px}
+#zoomBtns{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:5px}
+#zoomBtns button{width:38px;height:38px;padding:0;background:#172b39e8;font-size:21px}
+@media(max-width:850px){
+main{grid-template-columns:1fr}
+#mapwrap{min-height:min(65vh,550px);height:55vh}
+aside{display:grid;grid-template-columns:1fr 1fr}
+.panel{min-width:0}
+}
+@media(max-width:530px){
+header{padding:8px}
+h1{font-size:16px}
+main{padding:6px;gap:6px}
+#mapwrap{height:51vh;min-height:300px}
+aside{display:flex}
+.panel{padding:10px}
+.pill{padding:5px 7px;font-size:12px}
+}
+@media(orientation:landscape) and (max-height:600px){
+header{padding:5px 12px;flex-wrap:nowrap}
+header h1{font-size:15px}
+header small{display:none}
+main{display:grid;grid-template-columns:minmax(0,1fr) 265px;padding:5px;gap:6px;height:calc(100dvh - 57px)}
+#mapwrap{height:100%;min-height:0}
+aside{display:flex;overflow-y:auto;gap:6px}
+.panel{padding:8px}
+.panel h2{margin-bottom:5px;font-size:13px}
+.row{margin:3px 0}
+.legend,footer{display:none}
+#log{height:90px}
+#hint{font-size:10px;padding:5px}
+button{min-height:36px;padding:6px}
+}
+@media(orientation:portrait) and (max-width:650px){
+#mapwrap{height:48dvh;min-height:270px}
+}
+</style>
+</head>
+<body>
+<header>
+<div>
+<h1>PROJECT 1939</h1>
+<small>POLAND CAMPAIGN · Prototype 0.3</small>
+</div>
+<div class="pill" id="date">1 SEP 1939 · TURN 1</div>
+<div class="pill" id="resources">⚙ 12 Industry · 👥 18 Manpower</div>
+<button id="endTurn" class="primary">END TURN →</button>
+</header>
+
+<main>
+<section id="mapwrap">
+<canvas id="map"></canvas>
+<div id="hint">Tap a German province → tap a neighboring province to attack · Drag to pan · Pinch to zoom</div>
+<div id="zoomBtns">
+<button id="zoomIn" aria-label="Zoom in">+</button>
+<button id="zoomOut" aria-label="Zoom out">−</button>
+<button id="homeView" aria-label="Fit map">⌖</button>
+</div>
+</section>
+
+<aside>
+<section class="panel">
+<h2 id="provinceTitle">COMMAND HQ</h2>
+<div id="details">Select a German province to command its army. Capture Warsaw to win.</div>
+<p class="notice" id="notice"></p>
+<div class="actions">
+<button id="recruit">+ Infantry (4⚙ 3👥)</button>
+<button id="tank">+ Tank (7⚙ 4👥)</button>
+<button id="fortify">Fortify (3⚙)</button>
+</div>
+</section>
+
+<section class="panel">
+<h2>WAR REPORT</h2>
+<div class="row"><span>Germany</span><b id="gcount">—</b></div>
+<div class="row"><span>Poland</span><b id="pcount">—</b></div>
+<div class="row"><span>Warsaw</span><b id="warsaw">Polish control</b></div>
+<div class="row"><span>Turn</span><b id="turn">1</b></div>
+<div class="actions">
+<button id="reset">New campaign</button>
+<button id="help">How to play</button>
+</div>
+</section>
+
+<section class="panel">
+<h2>DISPATCHES</h2>
+<div id="log"></div>
+</section>
+</aside>
+</main>
+
+<div class="legend">
+<span><i class="sw" style="background:#697e8b"></i>Germany (you)</span>
+<span><i class="sw" style="background:#b58b5b"></i>Poland (AI)</span>
+<span><i class="sw" style="background:#536f68"></i>Neutral / impassable</span>
+<span>⚔ Armies shown as infantry / tanks</span>
+</div>
+
+<footer>Historically inspired September 1939 campaign map. Borders and regional geography are simplified for play.</footer>
+
+<div id="end">
+<div>
+<h2 id="endTitle"></h2>
+<p id="endText"></p>
+<button onclick="restart()">PLAY AGAIN</button>
+</div>
+</div>
+
+<script>
 'use strict';
-const canvas=document.getElementById('map'),ctx=canvas.getContext('2d'),wrap=document.getElementById('mapwrap');
+
+const canvas=document.getElementById('map');
+const ctx=canvas.getContext('2d');
+const wrap=document.getElementById('mapwrap');
 const $=id=>document.getElementById(id);
-// Hand-authored stylized regional polygons. Shared vertices keep borders seamless.
-const xs=[30,160,300,440,580,720,860],ys=[30,145,260,375,490,605];
-const pts=(arr)=>arr.map(([x,y])=>[x,y]);
+
+// Simplified regional map with shared borders.
+const jitter=(x,y)=>{
+  if(x===30||x===860||y===0||y===605)return [x,y];
+  const a=Math.sin(x*.043+y*.017)*13;
+  const b=Math.cos(x*.021-y*.037)*11;
+  return [x+a,y+b];
+};
+
+const pts=arr=>arr.map(([x,y])=>jitter(x,y));
+
 const templates=[
 ['Hamburg','G',[[30,30],[160,30],[160,145],[30,145]],2,0],
 ['Berlin','G',[[160,30],[300,30],[300,145],[160,145]],4,1],
@@ -25,31 +178,623 @@ const templates=[
 ['Kraków','P',[[440,260],[580,260],[580,375],[440,375]],4,0],
 ['Kielce','P',[[580,260],[720,260],[720,375],[580,375]],3,0],
 ['Lwów','P',[[720,260],[860,260],[860,375],[720,375]],3,0],
-['Bohemia','N',[[300,260],[440,260],[440,375],[300,375]],0,0],
+['Bohemia','G',[[300,260],[440,260],[440,375],[300,375]],0,0],
 ['Slovakia','N',[[300,375],[440,375],[440,490],[300,490]],0,0],
 ['Hungary','N',[[440,375],[580,375],[580,490],[440,490]],0,0],
 ['Romania','N',[[580,375],[860,375],[860,490],[580,490]],0,0],
-['Austria','N',[[160,375],[300,375],[300,490],[160,490]],0,0],
-['Baltic','N',[[580,0],[860,0],[860,30],[580,30]],0,0]
+['Austria','G',[[160,375],[300,375],[300,490],[160,490]],0,0],
+['Baltic Sea','N',[[580,0],[860,0],[860,30],[580,30]],0,0]
 ];
-let regions,turn,industry,manpower,selected,notice='',logs=[],finished=false,view={x:0,y:0,z:1},drag=null;
-function center(p){let a=0,cx=0,cy=0;for(let i=0;i<p.length;i++){const [x,y]=p[i],[X,Y]=p[(i+1)%p.length];let cross=x*Y-X*y;a+=cross;cx+=(x+X)*cross;cy+=(y+Y)*cross}return Math.abs(a)>1?[cx/(3*a),cy/(3*a)]:[p.reduce((s,v)=>s+v[0],0)/p.length,p.reduce((s,v)=>s+v[1],0)/p.length]}
-function reset(){regions=templates.map((t,id)=>({id,name:t[0],owner:t[1],poly:pts(t[2]),inf:t[3],tank:t[4],fort:0,moved:false,neighbors:[]}));for(const a of regions)for(const b of regions){if(a.id!==b.id&&touches(a.poly,b.poly))a.neighbors.push(b.id)}turn=1;industry=12;manpower=18;selected=1;logs=[];finished=false;view={x:0,y:0,z:1};$('end').style.display='none';addLog('1 September 1939: The campaign begins.');addLog('Capture Warsaw to secure victory.');setNotice('Select a German army, then tap an adjacent Polish province.');renderUI();fit();}
-function touches(a,b){let n=0;for(const p of a)for(const q of b)if(Math.hypot(p[0]-q[0],p[1]-q[1])<.1)n++;return n>=2}
-function addLog(s){logs.unshift('T'+turn+' · '+s);logs=logs.slice(0,35)}function setNotice(s){notice=s}
-function polyHit(p,x,y){let inside=false;for(let i=0,j=p.length-1;i<p.length;j=i++){let xi=p[i][0],yi=p[i][1],xj=p[j][0],yj=p[j][1];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)inside=!inside}return inside}
-function ownerColor(o){return o==='G'?'#697e8b':o==='P'?'#b58b5b':'#536f68'}
-function renderUI(){let r=regions[selected];$('date').textContent=`${new Date(Date.UTC(1939,8,1+(turn-1)*7)).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).toUpperCase()} · TURN ${turn}`;$('resources').textContent=`⚙ ${industry} Industry · 👥 ${manpower} Manpower`;$('turn').textContent=turn;$('gcount').textContent=regions.filter(x=>x.owner==='G').length+' provinces';$('pcount').textContent=regions.filter(x=>x.owner==='P').length+' provinces';$('warsaw').textContent=regions[10].owner==='G'?'German control':'Polish control';$('provinceTitle').textContent=r?r.name.toUpperCase():'COMMAND HQ';$('details').innerHTML=r?`<div class="row"><span>Controller</span><b>${r.owner==='G'?'🇩🇪 Germany':r.owner==='P'?'🇵🇱 Poland':'Neutral'}</b></div><div class="row"><span>Infantry</span><b>${r.inf}</b></div><div class="row"><span>Tanks</span><b>${r.tank}</b></div><div class="row"><span>Fortifications</span><b>${r.fort}</b></div><div class="row"><span>Orders</span><b>${r.moved?'Used this turn':'Available'}</b></div><small>${r.owner==='G'?'Tap an adjacent province to move or attack.':'Select a German province to give orders.'}</small>`:'Select a German province.';$('notice').textContent=notice;for(let id of ['recruit','tank','fortify'])$(id).disabled=!r||r.owner!=='G'||finished|| (id==='recruit'?(industry<4||manpower<3):id==='tank'?(industry<7||manpower<4):industry<3);$('endTurn').disabled=finished;$('log').innerHTML=logs.map(x=>'<div>'+x+'</div>').join('');draw()}
-function dice(n){return .8+Math.random()*.4}function power(r,attack){return (r.inf*1.2+r.tank*2.5)*(attack?1:1.16)+(!attack?r.fort*2:0)}
-function battle(a,b,ai=false){let atk=power(a,true)*dice(),def=power(b,false)*dice();let win=atk>def;let aloss=Math.min(a.inf,Math.max(1,Math.ceil(b.inf*.25+(win?0:2))));let tloss=Math.min(a.tank,Math.floor(b.tank*.35+(win?0:1)));a.inf-=aloss;a.tank-=tloss; if(win){let old=b.owner;b.owner=a.owner;b.inf=Math.max(1,Math.ceil(a.inf*.6));b.tank=Math.floor(a.tank*.6);a.inf-=b.inf;a.tank-=b.tank;b.fort=0;b.moved=true;addLog(`${a.owner==='G'?'German':'Polish'} forces captured ${b.name}!`);if(b.id===10&&b.owner==='G')finish(true);if(regions.filter(r=>r.owner==='G').length===0)finish(false)}else{b.inf=Math.max(1,b.inf-Math.ceil(a.inf*.18));addLog(`Attack on ${b.name} repelled.`)}a.moved=true;setNotice(win?`${b.name} captured. Losses: ${aloss} infantry, ${tloss} tanks.`:`Attack failed. Losses: ${aloss} infantry, ${tloss} tanks.`)}
-function selectRegion(id){if(finished)return;let target=regions[id],source=regions[selected];if(source&&source.owner==='G'&&target.owner!=='N'&&source.neighbors.includes(id)&&source.id!==id){if(source.moved){setNotice('That army already received orders this turn.');renderUI();return}if(source.inf+source.tank<2){setNotice('You need at least 2 units to advance.');renderUI();return}if(target.owner==='P'){battle(source,target)}else if(target.owner==='G'){let nInf=Math.max(0,source.inf-1),nTank=source.tank;target.inf+=nInf;target.tank+=nTank;source.inf-=nInf;source.tank=0;source.moved=true;setNotice(`Reinforcements moved to ${target.name}.`);addLog(`Army transferred from ${source.name} to ${target.name}.`)}selected=source.id}else{selected=id;setNotice(target.owner==='N'?'Neutral territory cannot be entered in this prototype.':target.owner==='P'?'Select a German province, then attack this province.':'Select an adjacent territory to give orders.')}renderUI()}
-function enemyTurn(){for(let i=0;i<2;i++){let options=regions.filter(r=>r.owner==='P'&&r.inf>=3).flatMap(r=>r.neighbors.map(n=>[r,regions[n]])).filter(([a,b])=>b.owner==='G'&&power(a,true)>power(b,false)*.7);if(!options.length)break;let [a,b]=options[Math.floor(Math.random()*options.length)];if(a.moved)continue;battle(a,b,true)}for(const r of regions.filter(x=>x.owner==='P')){if(Math.random()<.48)r.inf+=1}}
-function nextTurn(){if(finished)return;for(let r of regions)r.moved=false;turn++;industry+=5+Math.floor(regions.filter(x=>x.owner==='G').length/3);manpower+=5;enemyTurn();if(!finished&&turn>24)finish(false);if(!finished){addLog(`Turn ${turn}: New supplies delivered.`);setNotice('New turn. Your armies can move again.')}renderUI()}
-function finish(win){finished=true;$('endTitle').textContent=win?'VICTORY':'CAMPAIGN LOST';$('endText').textContent=win?`Warsaw has fallen on turn ${turn}. Germany wins the prototype campaign.`:'Warsaw held out, or German territory was lost. Try a different strategy.';$('end').style.display='flex'}
-function restart(){reset()}
-function fit(){const w=wrap.clientWidth,h=wrap.clientHeight;view.z=Math.min((w-35)/900,(h-35)/540);view.x=(w-900*view.z)/2;view.y=(h-540*view.z)/2;draw()}
-function draw(){let dpr=window.devicePixelRatio||1,w=wrap.clientWidth,h=wrap.clientHeight;if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr)}ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);ctx.fillStyle='#263d48';ctx.fillRect(0,0,w,h);ctx.translate(view.x,view.y);ctx.scale(view.z,view.z);for(let r of regions){ctx.beginPath();r.poly.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));ctx.closePath();ctx.fillStyle=ownerColor(r.owner);ctx.fill();ctx.strokeStyle='#d2d4c0';ctx.lineWidth=2/view.z;ctx.stroke();if(r.id===selected){ctx.strokeStyle='#ffe399';ctx.lineWidth=5/view.z;ctx.stroke()}let [x,y]=center(r.poly);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#14202a';ctx.font='bold 15px system-ui';ctx.fillText(r.name,x,y-14);if(r.owner!=='N'){ctx.fillStyle='#14202acc';ctx.fillRect(x-35,y+1,70,26);ctx.fillStyle='#fff2d5';ctx.font='bold 14px system-ui';ctx.fillText(`⚔ ${r.inf} / ${r.tank}`,x,y+14);if(r.fort){ctx.font='11px system-ui';ctx.fillText('▣'+r.fort,x,y+35)}}} }
-function worldPos(e){let box=canvas.getBoundingClientRect();return [(e.clientX-box.left-view.x)/view.z,(e.clientY-box.top-view.y)/view.z]}
-let pointers=new Map(),pinch=null;let movedGesture=false;canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY});if(pointers.size===2){movedGesture=true;let p=[...pointers.values()];pinch={distance:Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y),z:view.z,x:view.x,y:view.y}}});canvas.addEventListener('pointermove',e=>{let p=pointers.get(e.pointerId);if(!p)return;let dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;if(pointers.size===1){view.x+=dx;view.y+=dy;draw()}else if(pointers.size===2){let v=[...pointers.values()],dist=Math.hypot(v[0].x-v[1].x,v[0].y-v[1].y);let centerX=(v[0].x+v[1].x)/2-canvas.getBoundingClientRect().left,centerY=(v[0].y+v[1].y)/2-canvas.getBoundingClientRect().top;let z=Math.max(.25,Math.min(3,pinch.z*dist/Math.max(1,pinch.distance)));view.x=centerX-(centerX-pinch.x)*z/pinch.z;view.y=centerY-(centerY-pinch.y)*z/pinch.z;view.z=z;draw()}});canvas.addEventListener('pointerup',e=>{let p=pointers.get(e.pointerId);if(!p)return;let click=!movedGesture&&pointers.size===1&&Math.hypot(p.x-p.sx,p.y-p.sy)<16;pointers.delete(e.pointerId);if(pointers.size<2)pinch=null;if(pointers.size===0)movedGesture=false;if(click){let [x,y]=worldPos(e);let r=regions.find(r=>polyHit(r.poly,x,y));if(r)selectRegion(r.id)}});canvas.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);pinch=null});canvas.addEventListener('wheel',e=>{e.preventDefault();let box=canvas.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top,z=Math.max(.25,Math.min(3,view.z*(e.deltaY<0?1.1:.9)));view.x=x-(x-view.x)*z/view.z;view.y=y-(y-view.y)*z/view.z;view.z=z;draw()},{passive:false});
-function zoomBy(f){let x=wrap.clientWidth/2,y=wrap.clientHeight/2,z=Math.max(.25,Math.min(3,view.z*f));view.x=x-(x-view.x)*z/view.z;view.y=y-(y-view.y)*z/view.z;view.z=z;draw()}$('zoomIn').onclick=()=>zoomBy(1.35);$('zoomOut').onclick=()=>zoomBy(1/1.35);$('homeView').onclick=fit;$('recruit').onclick=()=>{let r=regions[selected];if(r&&r.owner==='G'&&industry>=4&&manpower>=3){industry-=4;manpower-=3;r.inf+=2;addLog(`2 infantry recruited in ${r.name}.`);setNotice('2 infantry deployed.');renderUI()}};$('tank').onclick=()=>{let r=regions[selected];if(r&&r.owner==='G'&&industry>=7&&manpower>=4){industry-=7;manpower-=4;r.tank++;addLog(`Tank battalion raised in ${r.name}.`);setNotice('Tank deployed.');renderUI()}};$('fortify').onclick=()=>{let r=regions[selected];if(r&&r.owner==='G'&&industry>=3){industry-=3;r.fort++;addLog(`${r.name} fortified.`);setNotice('Defenses strengthened.');renderUI()}};$('endTurn').onclick=nextTurn;$('reset').onclick=reset;$('help').onclick=()=>{setNotice('Select a German province, then tap an adjacent Polish province to attack. Each army moves once per turn. Recruit infantry or tanks using industry and manpower. Capture Warsaw to win.');renderUI()};window.addEventListener('resize',fit);reset();
-</script></body></html>
+
+let regions,turn,industry,manpower,selected;
+let notice='',logs=[],finished=false;
+let view={x:0,y:0,z:1};
+
+function center(p){
+  let a=0,cx=0,cy=0;
+  for(let i=0;i<p.length;i++){
+    const [x,y]=p[i];
+    const [X,Y]=p[(i+1)%p.length];
+    let cross=x*Y-X*y;
+    a+=cross;
+    cx+=(x+X)*cross;
+    cy+=(y+Y)*cross;
+  }
+  return Math.abs(a)>1
+    ?[cx/(3*a),cy/(3*a)]
+    :[
+      p.reduce((s,v)=>s+v[0],0)/p.length,
+      p.reduce((s,v)=>s+v[1],0)/p.length
+    ];
+}
+
+function touches(a,b){
+  let n=0;
+  for(const p of a){
+    for(const q of b){
+      if(Math.hypot(p[0]-q[0],p[1]-q[1])<.1)n++;
+    }
+  }
+  return n>=2;
+}
+
+function reset(){
+  regions=templates.map((t,id)=>({
+    id,
+    name:t[0],
+    owner:t[1],
+    poly:pts(t[2]),
+    inf:t[3],
+    tank:t[4],
+    fort:0,
+    moved:false,
+    neighbors:[]
+  }));
+
+  for(const a of regions){
+    for(const b of regions){
+      if(a.id!==b.id&&touches(a.poly,b.poly)){
+        a.neighbors.push(b.id);
+      }
+    }
+  }
+
+  turn=1;
+  industry=12;
+  manpower=18;
+  selected=1;
+  logs=[];
+  finished=false;
+  view={x:0,y:0,z:1};
+
+  $('end').style.display='none';
+  addLog('1 September 1939: The campaign begins.');
+  addLog('Capture Warsaw to secure victory.');
+  setNotice('Select a German army, then tap an adjacent Polish province.');
+  renderUI();
+  fit();
+}
+
+function addLog(s){
+  logs.unshift('T'+turn+' · '+s);
+  logs=logs.slice(0,35);
+}
+
+function setNotice(s){
+  notice=s;
+}
+
+function polyHit(p,x,y){
+  let inside=false;
+  for(let i=0,j=p.length-1;i<p.length;j=i++){
+    let xi=p[i][0],yi=p[i][1];
+    let xj=p[j][0],yj=p[j][1];
+    if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi){
+      inside=!inside;
+    }
+  }
+  return inside;
+}
+
+function ownerColor(o){
+  return o==='G'?'#697e8b':o==='P'?'#b58b5b':'#536f68';
+}
+
+function renderUI(){
+  let r=regions[selected];
+
+  $('date').textContent=
+    `${new Date(Date.UTC(1939,8,1+(turn-1)*7))
+      .toLocaleDateString('en-GB',{
+        day:'numeric',
+        month:'short',
+        year:'numeric',
+        timeZone:'UTC'
+      }).toUpperCase()} · TURN ${turn}`;
+
+  $('resources').textContent=`⚙ ${industry} Industry · 👥 ${manpower} Manpower`;
+  $('turn').textContent=turn;
+  $('gcount').textContent=regions.filter(x=>x.owner==='G').length+' provinces';
+  $('pcount').textContent=regions.filter(x=>x.owner==='P').length+' provinces';
+  $('warsaw').textContent=regions[10].owner==='G'?'German control':'Polish control';
+  $('provinceTitle').textContent=r?r.name.toUpperCase():'COMMAND HQ';
+
+  $('details').innerHTML=r?`
+    <div class="row">
+      <span>Controller</span>
+      <b>${r.owner==='G'?'🇩🇪 Germany':r.owner==='P'?'🇵🇱 Poland':'Neutral'}</b>
+    </div>
+    <div class="row"><span>Infantry</span><b>${r.inf}</b></div>
+    <div class="row"><span>Tanks</span><b>${r.tank}</b></div>
+    <div class="row"><span>Fortifications</span><b>${r.fort}</b></div>
+    <div class="row">
+      <span>Orders</span>
+      <b>${r.moved?'Used this turn':'Available'}</b>
+    </div>
+    <small>${r.owner==='G'
+      ?'Tap an adjacent province to move or attack.'
+      :'Select a German province to give orders.'}</small>
+  `:'Select a German province.';
+
+  $('notice').textContent=notice;
+
+  for(let id of ['recruit','tank','fortify']){
+    $(id).disabled=
+      !r||r.owner!=='G'||finished||
+      (id==='recruit'
+        ?(industry<4||manpower<3)
+        :id==='tank'
+          ?(industry<7||manpower<4)
+          :industry<3);
+  }
+
+  $('endTurn').disabled=finished;
+  $('log').innerHTML=logs.map(x=>'<div>'+x+'</div>').join('');
+  draw();
+}
+
+function dice(){
+  return .8+Math.random()*.4;
+}
+
+function power(r,attack){
+  return (r.inf*1.2+r.tank*2.5)*(attack?1:1.16)
+    +(!attack?r.fort*2:0);
+}
+
+function battle(a,b){
+  let atk=power(a,true)*dice();
+  let def=power(b,false)*dice();
+  let win=atk>def;
+
+  let aloss=Math.min(
+    a.inf,
+    Math.max(1,Math.ceil(b.inf*.25+(win?0:2)))
+  );
+  let tloss=Math.min(
+    a.tank,
+    Math.floor(b.tank*.35+(win?0:1))
+  );
+
+  a.inf-=aloss;
+  a.tank-=tloss;
+
+  if(win){
+    b.owner=a.owner;
+    b.inf=Math.max(1,Math.ceil(a.inf*.6));
+    b.tank=Math.floor(a.tank*.6);
+    a.inf-=b.inf;
+    a.tank-=b.tank;
+    b.fort=0;
+    b.moved=true;
+
+    addLog(`${a.owner==='G'?'German':'Polish'} forces captured ${b.name}!`);
+
+    if(b.id===10&&b.owner==='G')finish(true);
+    if(regions.filter(r=>r.owner==='G').length===0)finish(false);
+  }else{
+    b.inf=Math.max(1,b.inf-Math.ceil(a.inf*.18));
+    addLog(`Attack on ${b.name} repelled.`);
+  }
+
+  a.moved=true;
+
+  setNotice(win
+    ?`${b.name} captured. Losses: ${aloss} infantry, ${tloss} tanks.`
+    :`Attack failed. Losses: ${aloss} infantry, ${tloss} tanks.`);
+}
+
+function selectRegion(id){
+  if(finished)return;
+
+  let target=regions[id];
+  let source=regions[selected];
+
+  if(source&&source.owner==='G'
+    &&target.owner!=='N'
+    &&source.neighbors.includes(id)
+    &&source.id!==id){
+
+    if(source.moved){
+      setNotice('That army already received orders this turn.');
+      renderUI();
+      return;
+    }
+
+    if(source.inf+source.tank<2){
+      setNotice('You need at least 2 units to advance.');
+      renderUI();
+      return;
+    }
+
+    if(target.owner==='P'){
+      battle(source,target);
+    }else if(target.owner==='G'){
+      let nInf=Math.max(0,source.inf-1);
+      let nTank=source.tank;
+
+      target.inf+=nInf;
+      target.tank+=nTank;
+      source.inf-=nInf;
+      source.tank=0;
+      source.moved=true;
+
+      setNotice(`Reinforcements moved to ${target.name}.`);
+      addLog(`Army transferred from ${source.name} to ${target.name}.`);
+    }
+
+    selected=source.id;
+  }else{
+    selected=id;
+    setNotice(
+      target.owner==='N'
+        ?'This country is neutral in the current campaign.'
+        :target.owner==='P'
+          ?'Select a German province, then attack this province.'
+          :'Select an adjacent territory to give orders.'
+    );
+  }
+
+  renderUI();
+}
+
+function enemyTurn(){
+  for(let i=0;i<2;i++){
+    let options=regions
+      .filter(r=>r.owner==='P'&&r.inf>=3)
+      .flatMap(r=>r.neighbors.map(n=>[r,regions[n]]))
+      .filter(([a,b])=>
+        b.owner==='G'&&
+        power(a,true)>power(b,false)*.7
+      );
+
+    if(!options.length)break;
+
+    let [a,b]=options[Math.floor(Math.random()*options.length)];
+    if(a.moved)continue;
+
+    battle(a,b);
+  }
+
+  for(const r of regions.filter(x=>x.owner==='P')){
+    if(Math.random()<.48)r.inf+=1;
+  }
+}
+
+function nextTurn(){
+  if(finished)return;
+
+  for(let r of regions)r.moved=false;
+
+  turn++;
+  industry+=5+Math.floor(regions.filter(x=>x.owner==='G').length/3);
+  manpower+=5;
+
+  enemyTurn();
+
+  if(!finished&&turn>24)finish(false);
+
+  if(!finished){
+    addLog(`Turn ${turn}: New supplies delivered.`);
+    setNotice('New turn. Your armies can move again.');
+  }
+
+  renderUI();
+}
+
+function finish(win){
+  finished=true;
+  $('endTitle').textContent=win?'VICTORY':'CAMPAIGN LOST';
+  $('endText').textContent=win
+    ?`Warsaw has fallen on turn ${turn}. Germany wins the prototype campaign.`
+    :'Warsaw held out, or German territory was lost. Try a different strategy.';
+  $('end').style.display='flex';
+}
+
+function restart(){
+  reset();
+}
+
+function fit(){
+  const w=wrap.clientWidth;
+  const h=wrap.clientHeight;
+
+  view.z=Math.min((w-35)/900,(h-35)/540);
+  view.x=(w-900*view.z)/2;
+  view.y=(h-540*view.z)/2;
+
+  draw();
+}
+
+function drawBackdrop(){
+  ctx.fillStyle='#254957';
+  ctx.fillRect(-100,-90,1100,790);
+
+  ctx.fillStyle='#315b69';
+  ctx.beginPath();
+  ctx.ellipse(625,-35,320,105,0,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.font='italic 24px Georgia,serif';
+  ctx.textAlign='center';
+  ctx.fillStyle='#9bb9c2';
+  ctx.fillText('BALTIC SEA',690,13);
+
+  ctx.font='bold 12px system-ui';
+  ctx.fillStyle='#cbd5c4';
+  ctx.fillText('SEPTEMBER 1939 · CENTRAL EUROPE',445,585);
+}
+
+function draw(){
+  let dpr=window.devicePixelRatio||1;
+  let w=wrap.clientWidth;
+  let h=wrap.clientHeight;
+
+  if(canvas.width!==Math.round(w*dpr)
+    ||canvas.height!==Math.round(h*dpr)){
+    canvas.width=Math.round(w*dpr);
+    canvas.height=Math.round(h*dpr);
+  }
+
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle='#18394b';
+  ctx.fillRect(0,0,w,h);
+
+  ctx.translate(view.x,view.y);
+  ctx.scale(view.z,view.z);
+
+  drawBackdrop();
+
+  for(let r of regions){
+    ctx.beginPath();
+    r.poly.forEach((p,i)=>
+      i?ctx.lineTo(...p):ctx.moveTo(...p)
+    );
+    ctx.closePath();
+
+    ctx.fillStyle=ownerColor(r.owner);
+    ctx.fill();
+
+    ctx.strokeStyle='#d2d4c0';
+    ctx.lineWidth=2/view.z;
+    ctx.stroke();
+
+    if(r.id===selected){
+      ctx.strokeStyle='#ffe399';
+      ctx.lineWidth=5/view.z;
+      ctx.stroke();
+    }
+
+    let [x,y]=center(r.poly);
+
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillStyle='#14202a';
+    ctx.font='bold 15px system-ui';
+    ctx.fillText(r.name,x,y-14);
+
+    if(r.owner!=='N'){
+      ctx.fillStyle='#14202acc';
+      ctx.fillRect(x-35,y+1,70,26);
+
+      ctx.fillStyle='#fff2d5';
+      ctx.font='bold 14px system-ui';
+      ctx.fillText(`⚔ ${r.inf} / ${r.tank}`,x,y+14);
+
+      if(r.fort){
+        ctx.font='11px system-ui';
+        ctx.fillText('▣'+r.fort,x,y+35);
+      }
+    }
+  }
+
+  drawCities();
+}
+
+function drawCities(){
+  const cities=[
+    ['BERLIN',224,86],
+    ['WARSAW',650,199],
+    ['KRAKÓW',515,326],
+    ['KÖNIGSBERG',515,87],
+    ['POZNAŃ',369,86],
+    ['LVIV',790,322]
+  ];
+
+  for(const [name,x,y] of cities){
+    let [px,py]=jitter(x,y);
+
+    ctx.beginPath();
+    ctx.arc(px,py,4,0,Math.PI*2);
+    ctx.fillStyle='#f9e2a9';
+    ctx.fill();
+
+    ctx.strokeStyle='#24313b';
+    ctx.lineWidth=2;
+    ctx.stroke();
+  }
+}
+
+function worldPos(e){
+  let box=canvas.getBoundingClientRect();
+  return [
+    (e.clientX-box.left-view.x)/view.z,
+    (e.clientY-box.top-view.y)/view.z
+  ];
+}
+
+let pointers=new Map();
+let pinch=null;
+let movedGesture=false;
+
+canvas.addEventListener('pointerdown',e=>{
+  canvas.setPointerCapture(e.pointerId);
+
+  pointers.set(e.pointerId,{
+    x:e.clientX,
+    y:e.clientY,
+    sx:e.clientX,
+    sy:e.clientY
+  });
+
+  if(pointers.size===2){
+    movedGesture=true;
+    let p=[...pointers.values()];
+    pinch={
+      distance:Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y),
+      z:view.z,
+      x:view.x,
+      y:view.y
+    };
+  }
+});
+
+canvas.addEventListener('pointermove',e=>{
+  let p=pointers.get(e.pointerId);
+  if(!p)return;
+
+  let dx=e.clientX-p.x;
+  let dy=e.clientY-p.y;
+  p.x=e.clientX;
+  p.y=e.clientY;
+
+  if(pointers.size===1){
+    if(Math.hypot(p.x-p.sx,p.y-p.sy)>9)movedGesture=true;
+    view.x+=dx;
+    view.y+=dy;
+    draw();
+  }else if(pointers.size===2){
+    let v=[...pointers.values()];
+    let dist=Math.hypot(v[0].x-v[1].x,v[0].y-v[1].y);
+
+    let centerX=(v[0].x+v[1].x)/2
+      -canvas.getBoundingClientRect().left;
+    let centerY=(v[0].y+v[1].y)/2
+      -canvas.getBoundingClientRect().top;
+
+    let z=Math.max(.25,Math.min(
+      3,
+      pinch.z*dist/Math.max(1,pinch.distance)
+    ));
+
+    view.x=centerX-(centerX-pinch.x)*z/pinch.z;
+    view.y=centerY-(centerY-pinch.y)*z/pinch.z;
+    view.z=z;
+
+    draw();
+  }
+});
+
+canvas.addEventListener('pointerup',e=>{
+  let p=pointers.get(e.pointerId);
+  if(!p)return;
+
+  let click=!movedGesture
+    &&pointers.size===1
+    &&Math.hypot(p.x-p.sx,p.y-p.sy)<16;
+
+  pointers.delete(e.pointerId);
+
+  if(pointers.size<2)pinch=null;
+  if(pointers.size===0)movedGesture=false;
+
+  if(click){
+    let [x,y]=worldPos(e);
+    let r=regions.find(r=>polyHit(r.poly,x,y));
+    if(r)selectRegion(r.id);
+  }
+});
+
+canvas.addEventListener('pointercancel',e=>{
+  pointers.delete(e.pointerId);
+  pinch=null;
+});
+
+canvas.addEventListener('wheel',e=>{
+  e.preventDefault();
+
+  let box=canvas.getBoundingClientRect();
+  let x=e.clientX-box.left;
+  let y=e.clientY-box.top;
+
+  let z=Math.max(.25,Math.min(
+    3,
+    view.z*(e.deltaY<0?1.1:.9)
+  ));
+
+  view.x=x-(x-view.x)*z/view.z;
+  view.y=y-(y-view.y)*z/view.z;
+  view.z=z;
+
+  draw();
+},{passive:false});
+
+function zoomBy(f){
+  let x=wrap.clientWidth/2;
+  let y=wrap.clientHeight/2;
+  let z=Math.max(.25,Math.min(3,view.z*f));
+
+  view.x=x-(x-view.x)*z/view.z;
+  view.y=y-(y-view.y)*z/view.z;
+  view.z=z;
+
+  draw();
+}
+
+$('zoomIn').onclick=()=>zoomBy(1.35);
+$('zoomOut').onclick=()=>zoomBy(1/1.35);
+$('homeView').onclick=fit;
+
+$('recruit').onclick=()=>{
+  let r=regions[selected];
+  if(r&&r.owner==='G'&&industry>=4&&manpower>=3){
+    industry-=4;
+    manpower-=3;
+    r.inf+=2;
+    addLog(`2 infantry recruited in ${r.name}.`);
+    setNotice('2 infantry deployed.');
+    renderUI();
+  }
+};
+
+$('tank').onclick=()=>{
+  let r=regions[selected];
+  if(r&&r.owner==='G'&&industry>=7&&manpower>=4){
+    industry-=7;
+    manpower-=4;
+    r.tank++;
+    addLog(`Tank battalion raised in ${r.name}.`);
+    setNotice('Tank deployed.');
+    renderUI();
+  }
+};
+
+$('fortify').onclick=()=>{
+  let r=regions[selected];
+  if(r&&r.owner==='G'&&industry>=3){
+    industry-=3;
+    r.fort++;
+    addLog(`${r.name} fortified.`);
+    setNotice('Defenses strengthened.');
+    renderUI();
+  }
+};
+
+$('endTurn').onclick=nextTurn;
+$('reset').onclick=reset;
+
+$('help').onclick=()=>{
+  setNotice(
+    'Select a German province, then tap an adjacent Polish province to attack. '+
+    'Each army moves once per turn. Recruit infantry or tanks using industry '+
+    'and manpower. Capture Warsaw to win.'
+  );
+  renderUI();
+};
+
+window.addEventListener('resize',fit);
+reset();
+</script>
+</body>
+</html>
